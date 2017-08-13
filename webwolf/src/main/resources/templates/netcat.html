@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/header :: header-css"/>
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"/>
+
+<script type="text/javascript" th:src="@{js/fileUpload.js}"></script>
+
+<div class="container">
+
+
+    <div class="alert alert-info fade in">
+
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <p>
+            This is a simple netcat simulation, in your attack you can refer to http://localhost:8081/WebWolf/nc
+            and the incoming request will be available below. The endpoint listens to GET/POST/PUT
+        </p>
+        <p>
+            This is by no means a substitution of netcat but it offers enough functionality to callback to a safe
+            environment and does not require you to open a netcat on your local machine.
+        </p>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading"><strong>Netcat</strong>
+            <small></small>
+        </div>
+        <table class="table">
+            <thead class="thead-inverse">
+            <tr>
+                <th>Timestamp</th>
+                <th>Origin</th>
+                <th>Incoming request</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${files}">
+                <td th:text="${f.name}">filename</td>
+                <td th:text="${f.size}">size</td>
+                <td>
+                    <button class="fa fa-files-o"></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+
+</div>
+</body>
+</html>

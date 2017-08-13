@@ -24,13 +24,4 @@ public class WebWolfController {
         modelAndView.setViewName("home");
         return modelAndView;
     }
-
-    @GetMapping(value = "/files")
-    public ModelAndView files() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("files");
-        return modelAndView;
-    }
-
-
 }
