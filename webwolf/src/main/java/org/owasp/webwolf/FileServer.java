@@ -1,5 +1,7 @@
 package org.owasp.webwolf;
 
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -18,7 +20,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,6 +40,7 @@ public class FileServer {
         destinationDir.mkdirs();
         myFile.transferTo(new File(destinationDir, myFile.getOriginalFilename()));
         log.debug("File saved to {}", new File(destinationDir, myFile.getOriginalFilename()));
+        Files.touch(new File(destinationDir, user.getUsername() + "_changed"));
 
         ModelMap model = new ModelMap();
         model.addAttribute("uploadSuccess", "File uploaded successful");
@@ -64,14 +66,20 @@ public class FileServer {
 
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("files");
-        modelAndView.addObject("uploadSuccess", request.getParameter("uploadSuccess"));
+        File changeIndicatorFile = new File(destinationDir, user.getUsername() + "_changed");
+        if (changeIndicatorFile.exists()) {
+            modelAndView.addObject("uploadSuccess", request.getParameter("uploadSuccess"));
+        }
+        changeIndicatorFile.delete();
 
-        List<UploadedFile> uploadedFiles = new ArrayList<>();
+        List<UploadedFile> uploadedFiles = Lists.newArrayList();
         File[] files = destinationDir.listFiles(File::isFile);
-        for (File file : files) {
-            String size = FileUtils.byteCountToDisplaySize(file.length());
-            String link = String.format("files/%s/%s", username, file.getName());
-            uploadedFiles.add(new UploadedFile(file.getName(), size, link));
+        if (files != null) {
+            for (File file : files) {
+                String size = FileUtils.byteCountToDisplaySize(file.length());
+                String link = String.format("files/%s/%s", username, file.getName());
+                uploadedFiles.add(new UploadedFile(file.getName(), size, link));
+            }
         }
 
         modelAndView.addObject("files", uploadedFiles);

@@ -24,4 +24,5 @@ public class WebWolfController {
         modelAndView.setViewName("home");
         return modelAndView;
     }
+
 }
