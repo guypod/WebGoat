@@ -2,7 +2,7 @@ package org.owasp.webwolf.requests;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lombok.AllArgsConstructor;
+import com.hazelcast.core.HazelcastInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.trace.Trace;
 import org.springframework.boot.actuate.trace.TraceRepository;
@@ -10,6 +10,7 @@ import org.springframework.boot.actuate.trace.TraceRepository;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 /**
@@ -20,14 +21,15 @@ import static java.util.Optional.of;
  * @since 8/13/17.
  */
 @Slf4j
-@AllArgsConstructor
 public class WebWolfTraceRepository implements TraceRepository {
 
-    private static final int MAX_REQUESTS = 100;
-    private final int webGoatPort;
+    private final String webGoatPort;
+    private final Map<Cookie, ConcurrentLinkedDeque<Trace>> cookieTraces;
 
-
-    private final Map<Cookie, ConcurrentLinkedDeque<Trace>> cookieTraces = Maps.newConcurrentMap();
+    public WebWolfTraceRepository(String webGoatPort, HazelcastInstance hazelcastInstance) {
+        this.webGoatPort = webGoatPort;
+        this.cookieTraces = hazelcastInstance.getMap("cookieTraces");
+    }
 
     @Override
     public List<Trace> findAll() {
@@ -44,14 +46,11 @@ public class WebWolfTraceRepository implements TraceRepository {
     @Override
     public void add(Map<String, Object> map) {
         Optional<String> host = getFromHeaders("host", map);
-        if (host.isPresent() && host.get().contains("8080")) {
-            Optional<Cookie> cookie = getFromHeaders("cookie", map).map(c -> of(new Cookie(c))).orElse(of(new Cookie("1")));
+        if (host.isPresent() && host.get().contains(webGoatPort)) {
+            Optional<Cookie> cookie = getFromHeaders("cookie", map).map(c -> of(new Cookie(c))).orElse(empty());
             cookie.ifPresent(c -> {
                 ConcurrentLinkedDeque<Trace> traces = this.cookieTraces.getOrDefault(c, new ConcurrentLinkedDeque<>());
                 traces.addFirst(new Trace(new Date(), map));
-                if (traces.size() >= MAX_REQUESTS) {
-                    traces.removeLast();
-                }
                 cookieTraces.put(c, traces);
             });
         }

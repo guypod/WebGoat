@@ -1,5 +1,6 @@
 package org.owasp.webwolf;
 
+import com.hazelcast.core.HazelcastInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.owasp.webwolf.requests.WebWolfTraceRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +17,8 @@ import org.springframework.context.annotation.Bean;
 public class WebWolf extends SpringBootServletInitializer {
 
     @Bean
-    public TraceRepository traceRepository(@Value("${webgoat.port}") int port) {
-        return new WebWolfTraceRepository(port);
+    public TraceRepository traceRepository(@Value("${webgoat.port}") String port, HazelcastInstance hazelcastInstance) {
+        return new WebWolfTraceRepository(port, hazelcastInstance);
     }
 
     @Override

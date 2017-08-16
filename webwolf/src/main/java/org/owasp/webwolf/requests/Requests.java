@@ -2,7 +2,7 @@ package org.owasp.webwolf.requests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
+import com.hazelcast.core.HazelcastInstance;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +17,16 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Optional;
+
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
 
 /**
+ * Controller for fetching all the HTTP requests from WebGoat to WebWolf for a specific
+ * user.
+ *
  * @author nbaars
  * @since 8/13/17.
  */
@@ -32,6 +38,7 @@ public class Requests {
 
     private final WebWolfTraceRepository traceRepository;
     private final ObjectMapper objectMapper;
+    private final HazelcastInstance hazelcastInstance;
 
     @AllArgsConstructor
     @Getter
@@ -39,15 +46,15 @@ public class Requests {
         private final Date date;
         private final String path;
         private final String json;
-
     }
 
     @GetMapping
     public ModelAndView get(HttpServletRequest request) {
         ModelAndView m = new ModelAndView("requests");
-        Stream<Trace> traceStream = getUserCookie().stream().map(c -> traceRepository.findTraceForCookie(c)).flatMap(l -> l.stream());
-        List<Tracert> traces = traceStream.map(t -> new Tracert(t.getTimestamp(), path(t), toJsonString(t))).collect(Collectors.toList());
-        m.addObject("traces", traces);
+        getUserCookie().ifPresent(c -> {
+            List<Tracert> traces = traceRepository.findTraceForCookie(c).stream().map(t -> new Tracert(t.getTimestamp(), path(t), toJsonString(t))).collect(toList());
+            m.addObject("traces", traces);
+        });
         return m;
     }
 
@@ -61,12 +68,16 @@ public class Requests {
         } catch (JsonProcessingException e) {
             log.error("Unable to create json", e);
         }
-        return "No request found";
+        return "No request(s) found";
     }
 
-    private List<Cookie> getUserCookie() {
+    private Optional<Cookie> getUserCookie() {
         WebGoatUser user = (WebGoatUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return Lists.newArrayList(new Cookie("1"));
+        String cookieValue = (String) hazelcastInstance.getMap("userSessions").get(user.getUsername());
+        if (cookieValue != null) {
+            return of(new Cookie(cookieValue));
+        }
+        return empty();
     }
 
 }
