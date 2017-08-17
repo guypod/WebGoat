@@ -14,5 +14,6 @@ public interface SolutionConstants {
     String PASSWORD_TOM = "thisisasecretfortomonly";
     String PASSWORD_LARRY = "larryknows";
     String JWT_PASSWORD = "victory";
+    String ADMIN_PASSWORD_LINK = "375afe1104f4a487a73823c50a9292a2";
 
 }
