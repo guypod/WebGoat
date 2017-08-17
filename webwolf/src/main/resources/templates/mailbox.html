@@ -1,13 +1,14 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>WebWolf</title>
     <div th:replace="fragments/header :: header-css"/>
 </head>
 <body>
 
 <div th:replace="fragments/header :: header"/>
 
-<script type="text/javascript" th:src="@{js/fileUpload.js}"></script>
+<script type="text/javascript" th:src="@{js/mail.js}"></script>
 
 <div class="container">
 
@@ -56,7 +57,7 @@
                         </ul>
                     </div>
                     <div class="pull-right">
-                        <span class="text-muted"><b>1</b>–<b>50</b> of <b>277</b></span>
+                        <span class="text-muted"><b>1</b>–<b>50</b> of <b><span th:utext="${total}"></span></b></span>
                         <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-default">
                                 <span class="glyphicon glyphicon-chevron-left"></span>
@@ -74,7 +75,8 @@
                     <a href="#" class="btn btn-danger btn-sm btn-block" role="button">COMPOSE</a>
                     <hr/>
                     <ul class="nav nav-pills nav-stacked">
-                        <li class="active"><a href="#"><span class="badge pull-right">42</span> Inbox </a>
+                        <li class="active"><a href="#"><span class="badge pull-right" th:utext="${total}">42</span>
+                            Inbox </a>
                         </li>
                     </ul>
                 </div>
@@ -93,43 +95,34 @@
                     <!-- Tab panes -->
                     <div class="tab-content">
                         <div class="tab-pane fade in active" id="home">
-                            <div class="list-group">
-                                <a href="#" class="list-group-item">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox"/>
-                                        </label>
+                            <span th:each="mail : ${emails}" class="list-group">
+                                <a href="#" class="showMail list-group-item">
+
+
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                    <span class="name"
+                                          style="min-width: 120px; display: inline-block;"
+                                          th:text="${mail.shortSender}">WebGoat</span>
+                                    <span class="" th:text="${mail.title}">Title</span>
+                                    <span class="text-muted" style="font-size: 11px;" th:text="${mail.summary}">- summary</span>
+                                    <span class="badge" th:text="${mail.time}">12:10 AM</span>
+                                    <span class="pull-right">
+                                        <span class="glyphicon glyphicon-paperclip"></span>
+                                    </span>
+                                </a>
+                                    <!---->
+                                    <div class="left15 contents panel panel-default top10" style="display:none" >
+                                        <div class="panel-heading" >
+                                            <b><span th:text="${mail.title}"></span></b>
+                                            <b><span class="pull-right" th:text="${mail.sender}"></span></b>
+                                        </div>
+                                         <div class="panel-body">
+                                            <pre th:utext="${mail.contents}"/>
+                                         </div>
                                     </div>
-                                    <span class="glyphicon glyphicon-star-empty"></span><span class="name" style="min-width: 120px;
-                                display: inline-block;">Bhaumik Patel</span> <span class="">This is big title</span>
-                                    <span class="text-muted" style="font-size: 11px;">- Hi hello how r u ?</span> <span
-                                        class="badge">12:10 AM</span> <span class="pull-right"><span
-                                        class="glyphicon glyphicon-paperclip">
-                                </span></span></a><a href="#" class="list-group-item">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"/>
-                                    </label>
-                                </div>
-                                <span class="glyphicon glyphicon-star-empty"></span><span class="name" style="min-width: 120px;
-                                        display: inline-block;">Bhaumik Patel</span> <span
-                                    class="">This is big title</span>
-                                <span class="text-muted" style="font-size: 11px;">- Hi hello how r u ?</span> <span
-                                    class="badge">12:10 AM</span> <span class="pull-right"><span
-                                    class="glyphicon glyphicon-paperclip">
-                                        </span></span></a><a href="#" class="list-group-item read">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox"/>
-                                    </label>
-                                </div>
-                                <span class="glyphicon glyphicon-star"></span><span class="name" style="min-width: 120px;
-                                                display: inline-block;">Bhaumik Patel</span> <span class="">This is big title</span>
-                                <span class="text-muted" style="font-size: 11px;">- Hi hello how r u ?</span> <span
-                                    class="badge">12:10 AM</span> <span class="pull-right"><span
-                                    class="glyphicon glyphicon-paperclip">
-                                                </span></span></a>
-                            </div>
+
+                            </span>
+
                         </div>
                         <div class="tab-pane fade in" id="profile">
                             <div class="list-group">
@@ -139,7 +132,9 @@
                             </div>
                         </div>
                         <div class="tab-pane fade in" id="messages">
-                            ...
+                            <div class="list-group-item">
+                                <span class="text-center">Why the name "WebGoat"? Developers should not feel bad about not knowing security. Even the best programmers make security errors. What they need is a scapegoat, right? Just blame it on the 'Goat!</span>
+                            </div>
                         </div>
                         <div class="tab-pane fade in" id="settings">
                             This tab is empty.

@@ -25,11 +25,4 @@ public class WebWolfController {
         return modelAndView;
     }
 
-    @GetMapping(value = "/mail")
-    public ModelAndView mail() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("mailbox");
-        return modelAndView;
-    }
-
 }

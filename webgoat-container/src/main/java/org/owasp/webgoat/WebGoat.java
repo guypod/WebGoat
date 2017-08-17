@@ -42,6 +42,7 @@ import org.owasp.webgoat.session.WebgoatContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
@@ -57,7 +58,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import java.io.File;
 import java.util.Arrays;
 
-@SpringBootApplication
+@SpringBootApplication(exclude=HazelcastAutoConfiguration.class) //Only necessary when server starts (StartWebGoat)
 @Slf4j
 public class WebGoat extends SpringBootServletInitializer {
 

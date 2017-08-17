@@ -26,8 +26,6 @@ import java.io.*;
  *
  * @author Santeri Paavolainen http://santtu.iki.fi/md5/
  * @author Stephen Ostermiller http://ostermiller.org/contact.pl?regarding=Java+Utilities
- * @see MD5OutputStream
- * @see MD5InputStream
  * @since ostermillerutils 1.00.00
  */
 public class MD5 {

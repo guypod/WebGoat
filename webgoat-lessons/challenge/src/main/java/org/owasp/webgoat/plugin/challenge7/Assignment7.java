@@ -19,6 +19,8 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 import static org.owasp.webgoat.plugin.Flag.FLAGS;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -38,7 +40,7 @@ public class Assignment7 extends AssignmentEndpoint {
             "\n" +
             "If you have any comments or question, please do not hesitate to reach us at support@webgoat-cloud.org" +
             "\n\n" +
-            "Kind regards, team WebGoat";
+            "Kind regards, \nTeam WebGoat";
 
     @Autowired
     private HazelcastInstance hazelcastInstance;
@@ -60,8 +62,15 @@ public class Assignment7 extends AssignmentEndpoint {
             WebGoatUser webGoatUser = userRepository.findByUsername(email.substring(0, email.indexOf("@")));
             if (webGoatUser != null) {
                 String username = webGoatUser.getUsername();
-                IMap<Object, Object> emails = hazelcastInstance.getMap("challenge7");
-                emails.put(username, String.format(TEMPLATE, new PasswordResetLink().createPasswordReset(username, "webgoat")));
+                IMap<Object, Object> emails = hazelcastInstance.getMap("usersMail");
+                Mailbox mailbox = new Mailbox();
+                mailbox = (Mailbox) emails.getOrDefault(username, mailbox);
+                mailbox.addMail(Mailbox.Email.builder()
+                        .title("Your password reset link")
+                        .contents(String.format(TEMPLATE, new PasswordResetLink().createPasswordReset(username, "webgoat")))
+                        .sender("password-reset@webgoat-cloud.net")
+                        .time(LocalDateTime.now()).build());
+                emails.put(username, mailbox);
             }
         }
         return success().feedback("email.send").feedbackArgs(email).build();

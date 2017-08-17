@@ -164,12 +164,4 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
         return new LabelDebugger();
     }
 
-    @Bean
-    public FilterRegistrationBean cookieFilter(HazelcastInstance hazelcastInstance) {
-        final FilterRegistrationBean filterRegBean = new FilterRegistrationBean();
-        filterRegBean.setFilter(new CookieFilter(hazelcastInstance));
-        filterRegBean.addUrlPatterns("/*");
-        filterRegBean.setEnabled(Boolean.TRUE);
-        return filterRegBean;
-    }
 }
