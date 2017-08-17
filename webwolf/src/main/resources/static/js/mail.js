@@ -4,3 +4,7 @@ $(document).ready(function () {
         $(this).parent().find('.contents').toggle()
     });
 });
+
+function refreshEmails() {
+    location.reload();
+}

@@ -6,6 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -22,7 +23,8 @@ public class Mailbox {
     }
 
     public List<Email> getMails() {
-        return this.mails;
+        this.mails.sort(Comparator.comparing(Email::getTime).reversed());
+        return mails;
     }
 
     public int size() {
