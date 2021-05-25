@@ -2,7 +2,7 @@
  * This file is part of WebGoat, an Open Web Application Security Project utility. For details,
  * please see http://www.owasp.org/
  * <p>
- * Copyright (c) 2002 - 20014 Bruce Mayhew
+ * Copyright (c) 2002 - 2014 Bruce Mayhew
  * <p>
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -21,11 +21,13 @@
  * Source for this application is maintained at https://github.com/WebGoat/WebGoat, a repository for free software
  * projects.
  */
+
 package org.owasp.webgoat.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.owasp.webgoat.lessons.AbstractLesson;
+import org.flywaydb.core.Flyway;
+import org.owasp.webgoat.lessons.Lesson;
 import org.owasp.webgoat.session.WebSession;
 import org.owasp.webgoat.users.UserTracker;
 import org.owasp.webgoat.users.UserTrackerRepository;
@@ -34,33 +36,29 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-/**
- * <p>RestartLessonService class.</p>
- *
- * @author rlawson
- * @version $Id: $Id
- */
+import java.util.function.Function;
+
 @Controller
 @AllArgsConstructor
 @Slf4j
 public class RestartLessonService {
 
     private final WebSession webSession;
-    private UserTrackerRepository userTrackerRepository;
+    private final UserTrackerRepository userTrackerRepository;
+    private final Function<String, Flyway> flywayLessons;
 
-    /**
-     * Returns current lesson
-     *
-     * @return a {@link java.lang.String} object.
-     */
     @RequestMapping(path = "/service/restartlesson.mvc", produces = "text/text")
     @ResponseStatus(value = HttpStatus.OK)
     public void restartLesson() {
-        AbstractLesson al = webSession.getCurrentLesson();
+        Lesson al = webSession.getCurrentLesson();
         log.debug("Restarting lesson: " + al);
 
-        UserTracker userTracker = userTrackerRepository.findOne(webSession.getUserName());
+        UserTracker userTracker = userTrackerRepository.findByUser(webSession.getUserName());
         userTracker.reset(al);
         userTrackerRepository.save(userTracker);
+
+        var flyway = flywayLessons.apply(webSession.getUserName());
+        flyway.clean();
+        flyway.migrate();
     }
 }

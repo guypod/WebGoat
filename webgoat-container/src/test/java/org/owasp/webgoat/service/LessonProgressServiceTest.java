@@ -1,12 +1,12 @@
 package org.owasp.webgoat.service;
 
 import org.assertj.core.util.Maps;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.owasp.webgoat.lessons.AbstractLesson;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.owasp.webgoat.lessons.Lesson;
 import org.owasp.webgoat.lessons.Assignment;
 import org.owasp.webgoat.session.WebSession;
 import org.owasp.webgoat.users.LessonTracker;
@@ -17,9 +17,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * This file is part of WebGoat, an Open Web Application Security Project utility. For details,
  * please see http://www.owasp.org/
  * <p>
- * Copyright (c) 2002 - 20014 Bruce Mayhew
+ * Copyright (c) 2002 - 2014 Bruce Mayhew
  * <p>
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -53,13 +54,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @version $Id: $Id
  * @since November 25, 2016
  */
-@RunWith(MockitoJUnitRunner.class)
-public class LessonProgressServiceTest {
+@ExtendWith(MockitoExtension.class)
+class LessonProgressServiceTest {
 
     private MockMvc mockMvc;
 
     @Mock
-    private AbstractLesson lesson;
+    private Lesson lesson;
     @Mock
     private UserTracker userTracker;
     @Mock
@@ -69,18 +70,19 @@ public class LessonProgressServiceTest {
     @Mock
     private WebSession websession;
 
-    @Before
-    public void setup() {
-        Assignment assignment = new Assignment("test", "test");
-        when(userTrackerRepository.findOne(anyString())).thenReturn(userTracker);
-        when(userTracker.getLessonTracker(any(AbstractLesson.class))).thenReturn(lessonTracker);
+    @BeforeEach
+    void setup() {
+        Assignment assignment = new Assignment("test", "test", List.of());
+        when(userTrackerRepository.findByUser(any())).thenReturn(userTracker);
+        when(userTracker.getLessonTracker(any(Lesson.class))).thenReturn(lessonTracker);
         when(websession.getCurrentLesson()).thenReturn(lesson);
+        when(lesson.getAssignments()).thenReturn(List.of(assignment));
         when(lessonTracker.getLessonOverview()).thenReturn(Maps.newHashMap(assignment, true));
         this.mockMvc = MockMvcBuilders.standaloneSetup(new LessonProgressService(userTrackerRepository, websession)).build();
     }
 
     @Test
-    public void jsonLessonOverview() throws Exception {
+    void jsonLessonOverview() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders.get("/service/lessonoverview.mvc").accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].assignment.name", is("test")))

@@ -22,31 +22,12 @@ function($,_,Backbone) {
            $('#show-hints-button').hide();
         },
 
-		render:function(title) {
-			$('#show-source-button').hide();
-			$('#show-solution-button').hide();
-			$('#show-plan-button').hide();
-
-			if (this.hasSource) {
-				this.$el.find('#show-source-button').unbind().on('click',_.bind(this.showSource,this)).show();
-			}
-			if (this.hasSolution) {
-				this.$el.find('#show-solution-button').unbind().on('click',_.bind(this.showSolution,this)).show();
-			}
-
+		render:function() {
 			this.$el.find('#restart-lesson-button').unbind().on('click',_.bind(this.restartLesson,this)).show();
 		},
 
 		showHints: function() {
 		    this.trigger('hints:show','hint');
-		},
-
-		showSource: function() {
-			this.trigger('source:show','source');
-		},
-
-		showSolution: function() {
-			this.trigger('solution:show','solution');
 		},
 
 		restartLesson: function() {

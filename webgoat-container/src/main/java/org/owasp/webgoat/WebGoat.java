@@ -5,7 +5,7 @@
  * This file is part of WebGoat, an Open Web Application Security Project utility. For details,
  * please see http://www.owasp.org/
  * <p>
- * Copyright (c) 2002 - 20014 Bruce Mayhew
+ * Copyright (c) 2002 - 2014 Bruce Mayhew
  * <p>
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -28,56 +28,22 @@
  * @version $Id: $Id
  * @since October 28, 2003
  */
+
 package org.owasp.webgoat;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Context;
-import org.owasp.webgoat.plugins.PluginEndpointPublisher;
-import org.owasp.webgoat.plugins.PluginsLoader;
-import org.owasp.webgoat.session.Course;
 import org.owasp.webgoat.session.UserSessionData;
 import org.owasp.webgoat.session.WebSession;
-import org.owasp.webgoat.session.WebgoatContext;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.util.Arrays;
 
-@SpringBootApplication
-@Slf4j
-public class WebGoat extends SpringBootServletInitializer {
-
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(WebGoat.class);
-    }
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(WebGoat.class, args);
-    }
-
-    @Bean
-    @Primary
-    public Jackson2ObjectMapperBuilder jacksonBuilder() {
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        builder.indentOutput(true);
-        builder.serializationInclusion(JsonInclude.Include.NON_NULL);
-        return builder;
-    }
+@Configuration
+public class WebGoat {
 
     @Bean(name = "pluginTargetDirectory")
     public File pluginTargetDirectory(@Value("${webgoat.user.directory}") final String webgoatHome) {
@@ -86,39 +52,18 @@ public class WebGoat extends SpringBootServletInitializer {
 
     @Bean
     @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public WebSession webSession(WebgoatContext webgoatContext) {
-        return new WebSession(webgoatContext);
+    public WebSession webSession() {
+        return new WebSession();
     }
 
     @Bean
     @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
     public UserSessionData userSessionData() {
-        return new UserSessionData("test","data");
+        return new UserSessionData("test", "data");
     }
 
     @Bean
-    public PluginEndpointPublisher pluginEndpointPublisher(ApplicationContext applicationContext) {
-        return new PluginEndpointPublisher(applicationContext);
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
-
-    @Bean
-    public Course course(PluginEndpointPublisher pluginEndpointPublisher) {
-        return new PluginsLoader(pluginEndpointPublisher).loadPlugins();
-    }
-
-    @Bean
-    public EmbeddedServletContainerFactory servletContainer() {
-        TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
-        factory.setTomcatContextCustomizers(Arrays.asList(new CustomCustomizer()));
-        return factory;
-    }
-
-    static class CustomCustomizer implements TomcatContextCustomizer {
-        @Override
-        public void customize(Context context) {
-            context.setUseHttpOnly(false);
-        }
-    }
-
-
 }

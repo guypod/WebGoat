@@ -12,14 +12,14 @@ define(['jquery',
             template: PaginationTemplate,
             el: '#lesson-page-controls',
 
-            initialize: function ($contentPages,baseLessonUrl) {
+            initialize: function ($contentPages,baseLessonUrl,initPageNum) {
                 this.$contentPages = $contentPages;
                 this.collection = new LessonOverviewCollection();
                 this.listenTo(this.collection, 'reset', this.render);
                 this.numPages = this.$contentPages.length;
                 this.baseUrl = baseLessonUrl;
                 this.collection.fetch({reset:true});
-                this.initPagination();
+                this.initPagination(initPageNum);
                 //this.render();
              },
 
@@ -81,14 +81,19 @@ define(['jquery',
                         var solvedClass = 'solved-true'
                         for (var i=0; i< $assignmentForms.length; i++) {
                             //normalize path
-                            var action = $assignmentForms.attr('action');//.replace(/\//g,'');
-                            if (action && isAttackSolved(action)) {
-                                //pageClass = 'fa fa-check-square-o assignment-solved';
-                                //pageAssignments.attacks.push({solved:true});
-                            } else {
-                                solvedClass = 'solved-false';
-
+                            var action = $assignmentForms.attr('action');
+                            if (action.endsWith("/WebGoat/WebWolf/mail/")) {
+                            	//fix for now. the find does not seem to work properly and gets confused with two /mail
+                            	action = "/WebGoat/WebWolf/mail/send";                            	
+                            } 
+                            if (action.indexOf("?")>-1) {     
+                            	//used to also mark forms like JWT assignment 8 complete
+                            	action = action.substring(0,action.indexOf("?"));
                             }
+                            if (action && isAttackSolved(action)) {
+                            } else {
+                            	solvedClass = 'solved-false';
+                            }                           
                         }
                         pages.push({solvedClass:solvedClass,content:'assignment',curPageClass:curPageClass,pageClass:pageClass});
                     }
@@ -117,9 +122,9 @@ define(['jquery',
                 $('span.glyphicon-class.glyphicon.glyphicon-circle-arrow-right.show-next-page').hide();
             },
 
-            initPagination: function() {
-               //track pagination state in this view ... start at 0
-               this.currentPage = 0;
+            initPagination: function(initPageNum) {
+               //track pagination state in this view ... start at 0 .. unless a pageNum was provided
+               this.currentPage = !initPageNum ? 0 : initPageNum;
             },
 
             setCurrentPage: function (pageNum) {

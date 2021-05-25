@@ -15,12 +15,12 @@ Examples of Direct Object References using the GET method may look something lik
 
 === Other Methods
 
-POST, PUT, DELETE or other methods are also potentially succeptible and mainly only differ in the method and the potential payload.
+POST, PUT, DELETE or other methods are also potentially susceptible and mainly only differ in the method and the potential payload.
 
 == *Insecure* Direct Object References
 
 These are considered insecure when the reference is not properly handled and allows for authorization bypasses or disclose private data that could be used to
-perform opreations or access data that the user should not be able to perform or access.
+perform operations or access data that the user should not be able to perform or access.
 Let's say that as a user, you go to view your profile and the URL looks something like:
 
 `https://some.company.tld/app/user/23398`
@@ -33,6 +33,8 @@ This of course can be checked or expanded beyond GET methods to view data, but t
 === More good reading
 Before we go on to practice, here's some good reading on Insecure Direct Object References:
 
-* https://www.owasp.org/index.php/Testing_for_Insecure_Direct_Object_References_(OTG-AUTHZ-004)
+* link:++https://www.owasp.org/index.php/Testing_for_Insecure_Direct_Object_References_(OTG-AUTHZ-004)++[]
+* https://www.owasp.org/index.php/Top_10-2017_A5-Broken_Access_Control
+* https://cheatsheetseries.owasp.org/cheatsheets/Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet.html
 * https://www.owasp.org/index.php/Top_10_2013-A4-Insecure_Direct_Object_References
 * http://cwe.mitre.org/data/definitions/639.html

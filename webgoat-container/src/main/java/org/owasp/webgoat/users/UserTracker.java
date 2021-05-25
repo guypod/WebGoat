@@ -1,15 +1,15 @@
 
 package org.owasp.webgoat.users;
 
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
-import org.owasp.webgoat.lessons.AbstractLesson;
+import org.owasp.webgoat.lessons.Lesson;
 import org.owasp.webgoat.lessons.Assignment;
-import org.springframework.data.annotation.Id;
 
-import java.util.List;
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * This file is part of WebGoat, an Open Web Application Security Project utility. For details,
  * please see http://www.owasp.org/
  * <p>
- * Copyright (c) 2002 - 20014 Bruce Mayhew
+ * Copyright (c) 2002 - 2014 Bruce Mayhew
  * <p>
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -44,11 +44,18 @@ import java.util.stream.Collectors;
  * @since October 29, 2003
  */
 @Slf4j
+@Entity
 public class UserTracker {
 
     @Id
-    private final String user;
-    private List<LessonTracker> lessonTrackers = Lists.newArrayList();
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    @Column(name = "username")
+    private String user;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<LessonTracker> lessonTrackers = new HashSet<>();
+
+    private UserTracker() {}
 
     public UserTracker(final String user) {
         this.user = user;
@@ -60,7 +67,7 @@ public class UserTracker {
      * @param lesson the lesson
      * @return a lesson tracker created if not already present
      */
-    public LessonTracker getLessonTracker(AbstractLesson lesson) {
+    public LessonTracker getLessonTracker(Lesson lesson) {
         Optional<LessonTracker> lessonTracker = lessonTrackers
                 .stream().filter(l -> l.getLessonName().equals(lesson.getId())).findFirst();
         if (!lessonTracker.isPresent()) {
@@ -82,18 +89,18 @@ public class UserTracker {
         return lessonTrackers.stream().filter(l -> l.getLessonName().equals(id)).findFirst();
     }
 
-    public void assignmentSolved(AbstractLesson lesson, String assignmentName) {
+    public void assignmentSolved(Lesson lesson, String assignmentName) {
         LessonTracker lessonTracker = getLessonTracker(lesson);
         lessonTracker.incrementAttempts();
         lessonTracker.assignmentSolved(assignmentName);
     }
 
-    public void assignmentFailed(AbstractLesson lesson) {
+    public void assignmentFailed(Lesson lesson) {
         LessonTracker lessonTracker = getLessonTracker(lesson);
         lessonTracker.incrementAttempts();
     }
 
-    public void reset(AbstractLesson al) {
+    public void reset(Lesson al) {
         LessonTracker lessonTracker = getLessonTracker(al);
         lessonTracker.reset();
     }

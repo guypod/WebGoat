@@ -1,15 +1,11 @@
-# WebGoat: A deliberately insecure Web Application
+# WebGoat 8: A deliberately insecure Web Application
 
 [![Build Status](https://travis-ci.org/WebGoat/WebGoat.svg?branch=develop)](https://travis-ci.org/WebGoat/WebGoat)
 [![Coverage Status](https://coveralls.io/repos/WebGoat/WebGoat/badge.svg?branch=develop&service=github)](https://coveralls.io/github/WebGoat/WebGoat?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/b69ee3a86e3b4afcaf993f210fccfb1d)](https://www.codacy.com/app/dm/WebGoat)
-[![Dependency Status](https://www.versioneye.com/user/projects/562da95ae346d7000e0369aa/badge.svg?style=flat)](https://www.versioneye.com/user/projects/562da95ae346d7000e0369aa)
-[![OWASP Labs](https://img.shields.io/badge/owasp-labs-orange.svg)](https://www.owasp.org/index.php/OWASP_Project_Inventory#tab=Labs_Projects)
-
-# Important
-
-This is the development version of WebGoat 8, if you are looking for a released stable version please go to: https://github.com/WebGoat/WebGoat/wiki/Running-WebGoat
-
+[![OWASP Labs](https://img.shields.io/badge/owasp-lab%20project-f7b73c.svg)](https://www.owasp.org/index.php/OWASP_Project_Inventory#tab=Labs_Projects)
+[![GitHub release](https://img.shields.io/github/release/WebGoat/WebGoat.svg)](https://github.com/WebGoat/WebGoat/releases/latest)
+[![Gitter](https://badges.gitter.im/OWASPWebGoat/community.svg)](https://gitter.im/OWASPWebGoat/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 # Introduction
 
@@ -31,40 +27,52 @@ you are caught engaging in unauthorized hacking, most companies will fire you.
 Claiming that you were doing security research will not work as that is the
 first thing that all hackers claim.*
 
-# Run Instructions:
+# Installation Instructions:
 
 ## 1. Run using Docker
 
-From time to time we publish a new development preview of WebGoat 8 on Docker HUB, you can download this version
-[https://hub.docker.com/r/webgoat/webgoat-8.0/](https://hub.docker.com/r/webgoat/webgoat-8.0/).
-First install Docker, then open a command shell/window and type:
+Every release is also published on [DockerHub]((https://hub.docker.com/r/webgoat/webgoat-8.0/)).
+
+### Using docker run
+
+The easiest way to start WebGoat as a Docker container is to use the all-in-one docker container. This is a docker image that has WebGoat and WebWolf running inside.
+
+```shell
+docker run -p 127.0.0.1:8080:8080 -p 127.0.0.1:9090:9090 -e TZ=Europe/Amsterdam webgoat/goatandwolf
+```
+
+WebGoat will be located at: http://127.0.0.1:8080/WebGoat
+WebWolf will be located at: http://127.0.0.1:9090/WebWolf
+
+**Important**: Choose the correct timezone, so that the docker container and your host are in the same timezone. As it is important for the validity of JWT tokens used in certain exercises.
+
+
+## 2. Standalone
+
+Download the latest WebGoat and WebWolf release from [https://github.com/WebGoat/WebGoat/releases](https://github.com/WebGoat/WebGoat/releases)
 
 ```Shell
-docker pull webgoat/webgoat-8.0
-docker run -p 8080:8080 webgoat/webgoat-8.0
+java -jar webgoat-server-8.1.0.jar [--server.port=8080] [--server.address=localhost]
+java -jar webwolf-8.1.0.jar [--server.port=9090] [--server.address=localhost]
 ```
 
-Wait for the Docker container to start, and run `docker ps` to verify it's running.
-
-- If you are using `docker-machine`, verify the machine IP using `docker-machine env`
-- If you are using `boot2docker` on OSX, verify the IP by running `docker network inspect bridge`
-- Otherwise, the host will be bound to localhost
-
-Once you have the IP and port, you'll want to navigate to the `/WebGoat` path in the URL. For example:
-
-```
-http://192.168.99.100:8080/WebGoat
+The latest version of WebGoat needs Java 15 or above. By default, WebGoat and Webwolf start on port 8080, 9000 and 9090 with the environment variable WEBGOAT_PORT, WEBGOAT_HSQLPORT and WEBWOLF_PORT you can set different values.
+```Shell
+export WEBGOAT_PORT=18080
+export WEBGOAT_HSQLPORT=19001
+export WEBWOLF_PORT=19090
+java -jar webgoat-server-8.1.0.jar
+java -jar webwolf-8.1.0.jar 
 ```
 
-Here you'll be able to register a new user and get started.
+Use `set` instead of export if you're using Windows cmd. 
 
-_Please note: this version may not be completely in sync with the develop branch._
 
-## 2. Run from the sources
+## 3. Run from the sources
 
 ### Prerequisites:
 
-* Java 8
+* Java 15
 * Maven > 3.2.1
 * Your favorite IDE
 * Git, or Git support in your IDE
@@ -79,7 +87,7 @@ Now let's start by compiling the project.
 
 ```Shell
 cd WebGoat
-git checkout develop
+git checkout <<branch_name>>
 mvn clean install
 ```
 
@@ -90,61 +98,24 @@ mvn -pl webgoat-server spring-boot:run
 ```
 ... you should be running webgoat on localhost:8080/WebGoat momentarily
 
-To change IP addresss add the following variable to WebGoat/webgoat-container/src/main/resources/application.properties file
 
-```server.address=x.x.x.x
+To change the IP address add the following variable to the WebGoat/webgoat-container/src/main/resources/application.properties file:
+
+```
+server.address=x.x.x.x
 ```
 
-# Vagrant
+## 4. Run with custom menu
 
-We supply a complete development environment using Vagrant, to run WebGoat with Vagrant you must first have Vagrant and Virtualbox installed.
+For specialist only. There is a way to set up WebGoat with a personalized menu. You can leave out some menu categories or individual lessons by setting certain environment variables.
 
-```shell
-   $ cd WebGoat/webgoat-images/vagrant-users
-   $ vagrant up
-```
-
-Once the provisioning is complete login to the Virtualbox with username vagrant and password vagrant.
-The source code will be available in the home directory.
-
-
-# Building a new Docker image
-
-WebGoat now has Docker support for x86 and ARM (raspberry pi).
-### Docker on x86
-On x86 you can build a container with the following commands:
-
+For instance running as a jar on a Linux/macOS it will look like this:
 ```Shell
-cd WebGoat/
-mvn install
-cd webgoat-server
-mvn docker:build
-docker tag webgoat/webgoat-8.0 webgoat/webgoat-8.0:8.0
-docker login
-docker push webgoat/webgoat-8.0
+export EXCLUDE_CATEGORIES="CLIENT_SIDE,GENERAL,CHALLENGE"
+export EXCLUDE_LESSONS="SqlInjectionAdvanced,SqlInjectionMitigations"
+java -jar webgoat-server/target/webgoat-server-v8.2.0-SNAPSHOT.jar
 ```
-
-### Docker on ARM (Raspberry Pi)
-On a Raspberry Pi (it has yet been tested with a Raspberry Pi 3 and the hypriot Docker image) you need to build JFFI for
-ARM first. This is needed by the docker-maven-plugin ([see here](https://github.com/spotify/docker-maven-plugin/issues/233)):
-
+Or in a docker run it would (once this version is pushed into docker hub) look like this:
 ```Shell
-sudo apt-get install build-essential
-git clone https://github.com/jnr/jffi.git
-cd jffi
-ant jar
-cd build/jni
-sudo cp libjffi-1.2.so /usr/lib
-```
-
-When you have done this you can build the Docker container using the following commands:
-
-```Shell
-cd WebGoat/
-mvn install
-cd webgoat-server
-mvn docker:build -Drpi=true
-docker tag webgoat/webgoat-8.0 webgoat/webgoat-8.0:8.0
-docker login
-docker push webgoat/webgoat-8.0
+docker run -d -p 80:8888 -p 8080:8080 -p 9090:9090 -e TZ=Europe/Amsterdam -e EXCLUDE_CATEGORIES="CLIENT_SIDE,GENERAL,CHALLENGE" -e EXCLUDE_LESSONS="SqlInjectionAdvanced,SqlInjectionMitigations" webgoat/goatandwolf
 ```

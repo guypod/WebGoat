@@ -4,7 +4,7 @@
  * This file is part of WebGoat, an Open Web Application Security Project utility. For details,
  * please see http://www.owasp.org/
  * 
- * Copyright (c) 2002 - 20014 Bruce Mayhew
+ * Copyright (c) 2002 - 2014 Bruce Mayhew
  * 
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -24,10 +24,10 @@
  * projects.
  * 
  */
+
 package org.owasp.webgoat.lessons;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 
 /**
  * <p>Hint class.</p>
@@ -35,12 +35,9 @@ import lombok.Setter;
  * @author rlawson
  * @version $Id: $Id
  */
-@Getter
-@Setter
+@Value
 public class Hint {
 
     private String hint;
-    private String lesson;
     private String assignmentPath;
-    private int number;
 }

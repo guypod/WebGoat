@@ -7,14 +7,6 @@
     <meta http-equiv="Cache-Control" CONTENT="no-cache"/>
     <meta http-equiv="Cache-Control" CONTENT="no-store"/>
 
-    <!--[if lt IE 7]>
-    <id class="no-js lt-ie9 lt-ie8 lt-ie7"/> <![endif]-->
-    <!--[if IE 7]>
-    <id class="no-js lt-ie9 lt-ie8"/> <![endif]-->
-    <!--[if IE 8]>
-    <id class="no-js lt-ie9"/> <![endif]-->
-    <!--[if gt IE 8]><!-->
-
     <!--  CSS -->
     <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon"/>
 
@@ -24,19 +16,15 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/animate.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/coderay.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/css/lessons.css}"/>
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/css/asciidoctor-default.css}"/>-->
+
     <!--  end of CSS -->
 
     <!-- JS -->
-
-    <script src="js/modernizr-2.6.2.min.js"/>
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-    <script src="js/html5shiv.js"/>
-    <script src="js/respond.min.js"/>
-    <![endif]-->
+    <!-- <script src="js/modernizr.min.js"></script>-->
 
     <!-- Require.js used to load js asynchronously -->
-    <script src="js/libs/require.min.js" data-main="js/main.js"/>
+    <script src="js/libs/require.min.js" data-main="js/main"></script>
     <meta http-equiv="Content-Type" content="text/id; charset=ISO-8859-1"/>
     <title>WebGoat</title>
 </head>
@@ -49,12 +37,6 @@
             <a th:href="@{/welcome.mvc}" class="logo"><span>Web</span>Goat</a>
         </div>
         <!--logo end-->
-        <div class="toggle-navigation toggle-left">
-            <button type="button" class="btn btn-default" id="toggle-menu" data-toggle="tooltip" data-placement="right"
-                    title="Toggle Navigation">
-                <i class="fa fa-bars"></i>
-            </button>
-        </div><!--toggle navigation end-->
         <div id="lesson-title-wrapper">
 
         </div><!--lesson title end-->
@@ -67,8 +49,7 @@
                     <li role="presentation"><a role="menuitem" tabindex="-1" th:href="@{/logout}"
                                                th:text="#{logout}">Logout</a></li>
                     <li role="presentation" class="divider"></li>
-                    <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#">User: <span
-                            th:text="${#authentication.name}"></span></a>
+                    <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#">User: <span sec:authentication="name"></span></a>
                     </li>
                     <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#">Role:
                         <span sec:authorize="hasAuthority('WEBGOAT_USER')">User</span>
@@ -76,24 +57,25 @@
                     </a>
                     </li>
                     <li role="presentation" class="divider"></li>
-                    <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#"
-                                                                th:text="#{version}">Version: <span
-                            th:text="${@environment.getProperty('webgoat.build.version')}"></span></a>
+                    <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#">
+                        <span th:text="#{version}">Version:</span><span>: </span>
+                        <span th:text="${@environment.getProperty('webgoat.build.version')}"></span></a>
                     </li>
-                    <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#"
-                                                                th:text="#{build}">Build:
+                    <li role="presentation" class="disabled"><a role="menuitem" tabindex="-1" href="#">
+                        <span th:text="#{build}">Build:</span><span>: </span>
                         <span th:text="${@environment.getProperty('webgoat.build.number')}"></span></a></li>
-
                 </ul>
             </div>
             <div style="display:inline" id="settings">
                 <!--<button type="button" id="admin-button" class="btn btn-default right_nav_button" title="Administrator">-->
                 <!--<i class="fa fa-cog"></i>-->
                 <!--</button>-->
-                <button type="button" id="report-card-button" class="btn btn-default right_nav_button button-up"
-                        th:title="#{report.card}">
-                    <a href="#reportCard"><i class="fa fa-bar-chart-o"></i></a>
-                </button>
+                <a href="#reportCard">
+                    <button type="button" id="report-card-button" class="btn btn-default right_nav_button button-up"
+                            th:title="#{report.card}">
+                       <i class="fa fa-bar-chart-o"></i>
+                    </button>
+                </a>
                 <!--<button type="button" id="user-management" class="btn btn-default right_nav_button"-->
                 <!--title="User management">-->
                 <!--<i class="fa fa-users"></i>-->
@@ -103,7 +85,7 @@
                     data-toggle="modal" data-target="#about-modal">
                 <i class="fa fa-info"></i>
             </button>
-            <a href="mailto:${contactEmail}?Subject=Webgoat%20feedback" target="_top">
+            <a th:href="'mailto:' + ${@environment.getProperty('webgoat.email')} + '?Subject=Webgoat%20feedback'" target="_top">
                 <button type="button" class="btn btn-default right_nav_button" data-toggle="tooltip"
                         th:title="#{contact}">
                     <i class="fa fa-envelope"></i>
@@ -121,27 +103,19 @@
 
     <!--main content start-->
     <section class="main-content-wrapper">
-        <section id="main-content"> <!--ng-controller="goatLesson"-->
+        <section id="main-content">
             <div id="lesson-page" class="pages">
                 <div class="row">
                     <div class="col-md-8">
-                        <!--<div class="col-md-12" align="left">-->
-                        <!---->
-                        <!--&lt;!&ndash; hints moved into lesson template &ndash;&gt;-->
-                        <!--</div>-->
                         <div class="col-md-12" align="left">
                             <div id="lesson-content-wrapper" class="panel">
                                 <div class="" id="error-notification-container">
                                     <div class="" id="error-notification">
-                                        <i class="fa fa-exclamation-circle"/> There was an unexpected error. Please try
-                                        again.
+                                        <i class="fa fa-exclamation-circle"> There was an unexpected error. Please try
+                                            again.</i>
                                     </div>
                                 </div>
                                 <div class="" id="help-controls">
-                                    <button class="btn btn-primary btn-xs btn-danger help-button"
-                                            id="show-source-button">
-                                        <i class="fa fa-code"/>
-                                    </button>
                                     <button class="btn btn-primary btn-xs btn-danger help-button"
                                             id="show-hints-button" th:text="#{show.hints}">Show hints
                                     </button>
@@ -177,39 +151,6 @@
 
                                 <div class="lesson-content">
 
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="lesson-helps-wrapper" class="panel">
-                    <div class="lesson-help" id="lesson-plan-row">
-                        <div class="col-md-12">
-                            <h4>Lesson Plan</h4>
-
-                            <div class="panel">
-                                <div class="panel-body" id="lesson-plan-content">
-                                    <!-- allowing jQuery to handle this one -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="lesson-help" id="lesson-solution-row">
-                        <div class="col-md-12">
-                            <h4>Lesson Solution</h4>
-
-                            <div class="panel">
-                                <div class="panel-body" id="lesson-solution-content">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="lesson-help" id="lesson-source-row">
-                        <div class="col-md-12">
-                            <h4>Lesson Source Code</h4>
-
-                            <div class="panel">
-                                <div class="panel-body" id="lesson-source-content">
                                 </div>
                             </div>
                         </div>

@@ -1,19 +1,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
-
-<script th:src="@{/lesson_js/xxe.js}" language="JavaScript"></script>
+<header>
+<script th:src="@{/lesson_js/xxe.js}"></script>
+</header>
+<body>
 
 <div class="lesson-page-wrapper">
-    <!-- reuse this lesson-page-wrapper block for each 'page' of content in your lesson -->
-    <!-- include content here, or can be placed in another location. Content will be presented via asciidocs files,
-    which you put in src/main/resources/plugin/lessonplans/{lang}/{fileName}.adoc -->
     <div class="adoc-content" th:replace="doc:XXE_plan.adoc"></div>
 </div>
 
 <div class="lesson-page-wrapper">
-    <!-- reuse this lesson-page-wrapper block for each 'page' of content in your lesson -->
-    <!-- include content here, or can be placed in another location. Content will be presented via asciidocs files,
-    which you put in src/main/resources/plugin/lessonplans/{lang}/{fileName}.adoc -->
     <div class="adoc-content" th:replace="doc:XXE_intro.adoc"></div>
+</div>
+
+<div class="lesson-page-wrapper">
+    <div class="adoc-content" th:replace="doc:XXE_simple_introduction.adoc"></div>
 </div>
 
 <div class="lesson-page-wrapper">
@@ -26,6 +26,7 @@
               method="POST" name="form"
               prepareData="simpleXXE"
               successCallback="simpleXXECallback"
+              failureCallback="simpleXXECallback"
               contentType="application/xml"
               action="/WebGoat/xxe/simple">
             <div class="container-fluid">
@@ -75,6 +76,16 @@
 </div>
 
 <div class="lesson-page-wrapper">
+    <div class="lesson-page-solution">
+        <div class="adoc-content" th:replace="doc:XXE_simple_solution.adoc"></div>
+    </div>
+</div>
+
+<div class="lesson-page-wrapper">
+    <div class="adoc-content" th:replace="doc:XXE_code.adoc"></div>
+</div>
+
+<div class="lesson-page-wrapper">
     <div class="adoc-content" th:replace="doc:XXE_changing_content_type.adoc"></div>
     <div class="attack-container">
         <div class="assignment-success"><i class="fa fa-2 fa-check hidden" aria-hidden="true"></i></div>
@@ -82,6 +93,7 @@
               method="POST" name="form"
               prepareData="contentTypeXXE"
               successCallback="contentTypeXXECallback"
+              failureCallback="contentTypeXXECallback"
               action="xxe/content-type"
               contentType="application/json">
             <div class="container-fluid">
@@ -130,6 +142,11 @@
     </div>
 </div>
 
+<div class="lesson-page-wrapper">
+    <div class="lesson-page-solution">
+        <div class="adoc-content" th:replace="doc:XXE_changing_content_type_solution.adoc"></div>
+    </div>
+</div>
 
 <div class="lesson-page-wrapper">
     <div class="adoc-content" th:replace="doc:XXE_overflow.adoc"></div>
@@ -142,11 +159,13 @@
 <div class="lesson-page-wrapper">
     <div class="adoc-content" th:replace="doc:XXE_blind_assignment.adoc"></div>
     <div class="attack-container">
+        <img th:src="@{/images/wolf-enabled.png}" class="webwolf-enabled"/>
         <div class="assignment-success"><i class="fa fa-2 fa-check hidden" aria-hidden="true"></i></div>
         <form class="attack-form" accept-charset="UNKNOWN"
               method="POST" name="form"
               prepareData="blindXXE"
               successCallback="blindXXECallback"
+              failureCallback="blindXXECallback"
               action="/WebGoat/xxe/blind"
               contentType="application/xml">
             <div class="container-fluid">
@@ -199,5 +218,11 @@
     <div class="adoc-content" th:replace="doc:XXE_mitigation.adoc"></div>
 </div>
 
+<div class="lesson-page-wrapper">
+    <div class="adoc-content" th:replace="doc:XXE_static_code_analysis.adoc"></div>
+    <br/>
+    <a id="submitlink" class="btn btn-primary" href="" onclick="javascript:$('#patchbutton').load('/WebGoat/xxe/applysecurity');return false;"><span id="patchbutton">Apply XXE security patch</span></a>
+</div>
 
+</body>
 </html>
